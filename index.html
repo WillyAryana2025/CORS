@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <base target="_top" />
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no"
+    />
+    <title>Sistem Absensi Sales - AQSHAMART</title>
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+      rel="stylesheet"
+    />
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        -webkit-tap-highlight-color: transparent;
+      }
+      html {
+        font-size: 16px;
+      }
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          Oxygen, Ubuntu, Cantarell, sans-serif;
+        background: linear-gradient(135deg, #16a34a 0%, #f97316 100%);
+        min-height: 100vh;
+        display: flex;
+        align-items: flex-start;
+        justify-content: center;
+        padding: 8px;
+      }
+      .container {
+        background: rgba(255, 255, 255, 0.98);
+        border-radius: 20px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        width: 100%;
+        max-width: 400px;
+        overflow: hidden;
+      }
+      .header {
+        background: linear-gradient(135deg, #16a34a, #15803d);
+        color: white;
+        padding: 20px 16px;
+        text-align: center;
+      }
+      .header h1 {
+        font-size: 18px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+      }
+      .header p {
+        opacity: 0.9;
+        font-size: 12px;
+      }
+      .progress-container {
+        background: white;
+        padding: 12px 16px 16px;
+        border-bottom: 1px solid #e5e7eb;
+      }
+      .progress-bar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        position: relative;
+        margin: 0 10px;
+      }
+      .progress-bar::before {
+        content: "";
+        position: absolute;
+        top: 50%;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background: #e5e7eb;
+        z-index: 1;
+      }
+      .progress-line {
+        position: absolute;
+        top: 50%;
+        left: 0;
+        height: 2px;
+        background: linear-gradient(90deg, #16a34a, #f97316);
+        z-index: 2;
+        transition: width 0.5s ease;
+      }
+      .progress-step {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background: #e5e7eb;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #6b7280;
+        font-weight: 600;
+        font-size: 11px;
+        position: relative;
+        z-index: 3;
+        transition: all 0.3s ease;
+      }
+      .progress-step.active {
+        background: linear-gradient(135deg, #16a34a, #15803d);
+        color: white;
+      }
+      .progress-step.completed {
+        background: linear-gradient(135deg, #f97316, #ea580c);
+        color: white;
+      }
+      .step-label {
+        position: absolute;
+        top: 38px;
+        left: 50%;
+        transform: translateX(-50%);
+        font-size: 9px;
+        color: #6b7280;
+        white-space: nowrap;
+      }
+      .step-label.active {
+        color: #16a34a;
+        font-weight: 600;
+      }
+      .step-label.completed {
+        color: #f97316;
+        font-weight: 600;
+      }
+      .form-container {
+        padding: 20px 16px 24px;
+      }
+      .field-group {
+        margin-bottom: 18px;
+      }
+      .field-label {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-weight: 600;
+        color: #374151;
+        margin-bottom: 8px;
+        font-size: 14px;
+      }
+      .form-input {
+        width: 100%;
+        padding: 14px 16px;
+        border: 2px solid #e5e7eb;
+        border-radius: 12px;
+        font-size: 16px;
+      }
+      .form-input:focus {
+        outline: none;
+        border-color: #16a34a;
+      }
+      .form-input:read-only {
+        background: #f9fafb;
+        cursor: not-allowed;
+      }
+      .camera-section {
+        border: 2px dashed #e5e7eb;
+        border-radius: 16px;
+        padding: 16px;
+        text-align: center;
+      }
+      .camera-preview {
+        width: 100%;
+        max-width: 280px;
+        height: 160px;
+        border-radius: 12px;
+        object-fit: cover;
+        margin: 0 auto 12px;
+        display: none;
+      }
+      #camera-placeholder i {
+        font-size: 36px !important;
+        color: #d1d5db;
+        margin-bottom: 12px;
+        display: block;
+      }
+      .btn {
+        padding: 12px 16px;
+        border: none;
+        border-radius: 10px;
+        font-weight: 600;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+      .btn-primary {
+        background: linear-gradient(135deg, #16a34a, #15803d);
+        color: white;
+      }
+      .signature-container {
+        border: 2px solid #e5e7eb;
+        border-radius: 16px;
+        padding: 12px;
+      }
+      .signature-pad {
+        width: 100%;
+        height: 100px;
+        border: 2px dashed #d1d5db;
+        border-radius: 12px;
+        cursor: crosshair;
+      }
+      .submit-btn {
+        width: 100%;
+        padding: 16px;
+        background: linear-gradient(135deg, #f97316, #ea580c);
+        color: white;
+        border: none;
+        border-radius: 16px;
+        font-size: 16px;
+        font-weight: 700;
+        cursor: pointer;
+      }
+      .loader {
+        display: none;
+        text-align: center;
+        padding: 30px 20px;
+      }
+      .loader-spinner {
+        width: 40px;
+        height: 40px;
+        border: 3px solid #f3f4f6;
+        border-top: 3px solid #16a34a;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        margin: 0 auto 16px;
+      }
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+      .page {
+        display: none;
+      }
+      .page.active {
+        display: block;
+      }
+      .checkout-container,
+      .completion-container {
+        text-align: center;
+        padding: 30px 20px 40px;
+      }
+      .visit-info {
+        background: #f8fafc;
+        border-radius: 16px;
+        padding: 16px;
+        margin-bottom: 24px;
+        text-align: left;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <div class="header-content">
+          <h1 id="page-title">
+            <i class="fas fa-user-check"></i> Absensi Kunjungan Sales & MD
+          </h1>
+          <p id="page-subtitle"></p>
+        </div>
+      </div>
+      <div class="progress-container">
+        <div class="progress-bar">
+          <div class="progress-line" id="progress-line"></div>
+          <div class="progress-step active" id="step-1">
+            <i class="fas fa-user-edit"></i>
+            <div class="step-label active">Check-in</div>
+          </div>
+          <div class="progress-step" id="step-2">
+            <i class="fas fa-clock"></i>
+            <div class="step-label">Kunjungan</div>
+          </div>
+          <div class="progress-step" id="step-3">
+            <i class="fas fa-check-circle"></i>
+            <div class="step-label">Selesai</div>
+          </div>
+        </div>
+      </div>
+
+      <div id="checkin-page" class="page active">
+        <div class="form-container">
+          <form id="checkin-form">
+            <div class="field-group">
+              <label class="field-label"
+                ><i class="fas fa-clock"></i>Timestamp</label
+              >
+              <input type="text" id="timestamp" class="form-input" readonly />
+            </div>
+            <div class="field-group">
+              <label class="field-label"
+                ><i class="fas fa-user"></i>Nama Sales</label
+              >
+              <input type="text" id="nama-sales" class="form-input" required />
+            </div>
+            <div class="field-group">
+              <label class="field-label"
+                ><i class="fas fa-building"></i>Supplier</label
+              >
+              <input type="text" id="supplier" class="form-input" required />
+            </div>
+            <div class="field-group">
+              <label class="field-label"
+                ><i class="fas fa-camera"></i>Foto Kartu Nama</label
+              >
+              <div class="camera-section">
+                <input
+                  type="file"
+                  id="photo-input"
+                  accept="image/*"
+                  capture="environment"
+                  style="display: none"
+                />
+                <img
+                  id="photo-preview"
+                  class="camera-preview"
+                  alt="Preview foto"
+                />
+                <div id="camera-placeholder">
+                  <i class="fas fa-camera"></i>
+                  <button
+                    type="button"
+                    onclick="document.getElementById('photo-input').click()"
+                    class="btn btn-primary"
+                  >
+                    Ambil Foto
+                  </button>
+                </div>
+              </div>
+            </div>
+            <div class="field-group">
+              <label class="field-label"
+                ><i class="fas fa-signature"></i>Tanda Tangan Digital</label
+              >
+              <div class="signature-container">
+                <canvas id="signature-pad" class="signature-pad"></canvas>
+              </div>
+              <button
+                type="button"
+                onclick="signaturePad.clear()"
+                class="btn btn-outline"
+                style="
+                  width: auto;
+                  padding: 5px 10px;
+                  font-size: 12px;
+                  margin-top: 5px;
+                "
+              >
+                Hapus TTD
+              </button>
+            </div>
+            <button type="submit" id="submit-btn" class="submit-btn">
+              <i class="fas fa-check-circle"></i>Check-in Sekarang
+            </button>
+          </form>
+          <div id="loader" class="loader">
+            <div class="loader-spinner"></div>
+            <h3>Memproses Data...</h3>
+          </div>
+        </div>
+      </div>
+
+      <div id="checkout-page" class="page">
+        <div class="checkout-container">
+          <h2>Kunjungan Berlangsung</h2>
+          <p>
+            Anda telah berhasil check-in. Silahkan klik tombol Checkout jika
+            sudah selesai.
+          </p>
+          <div class="visit-info">
+            <p>
+              <strong>ID Kunjungan:</strong> <span id="display-visit-id"></span>
+            </p>
+            <p>
+              <strong>Check-in:</strong> <span id="display-checkin-time"></span>
+            </p>
+          </div>
+          <button type="button" id="checkout-btn" class="submit-btn">
+            Checkout Sekarang
+          </button>
+        </div>
+      </div>
+
+      <div id="completion-page" class="page">
+        <div class="completion-container">
+          <h2>Kunjungan Selesai!</h2>
+          <p>Terima kasih. Data kunjungan Anda telah berhasil dicatat.</p>
+          <div class="visit-info">
+            <p>
+              <strong>ID Kunjungan:</strong> <span id="final-visit-id"></span>
+            </p>
+            <p>
+              <strong>Check-in:</strong> <span id="final-checkin-time"></span>
+            </p>
+            <p>
+              <strong>Checkout:</strong> <span id="final-checkout-time"></span>
+            </p>
+            <p><strong>Durasi:</strong> <span id="final-duration"></span></p>
+          </div>
+          <button type="button" id="new-visit-btn" class="btn btn-primary">
+            Absen Kunjungan Baru
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.0.0/dist/signature_pad.umd.min.js"></script>
+    <script>
+      // PASTE URL WEB APP ANDA DARI HASIL DEPLOY APPS SCRIPT
+      const SCRIPT_URL =
+        "https://script.google.com/macros/s/AKfycbzFsD9VQfdosG700tZtCGJ-vJKeGuwrfyi-9-O33a1rdCxCGoqLrNlMiaHpKnFYPHymeQ/exec";
+
+      const checkinPage = document.getElementById("checkin-page");
+      const checkoutPage = document.getElementById("checkout-page");
+      const completionPage = document.getElementById("completion-page");
+      const loader = document.getElementById("loader");
+      const photoInput = document.getElementById("photo-input");
+      const photoPreview = document.getElementById("photo-preview");
+      const signaturePadCanvas = document.getElementById("signature-pad");
+      const signaturePad = new SignaturePad(signaturePadCanvas, {
+        minWidth: 1,
+        maxWidth: 2,
+      });
+      let currentVisitId = null;
+      let checkinTimestampISO = null;
+
+      function showPage(pageNumber) {
+        document
+          .querySelectorAll(".page")
+          .forEach((p) => p.classList.remove("active"));
+        if (pageNumber === 1) {
+          checkinPage.classList.add("active");
+          document.getElementById("page-title").innerHTML =
+            '<i class="fas fa-user-check"></i> Absensi Kunjungan Sales & MD';
+          document.getElementById("page-subtitle").textContent =
+            "Silakan isi form check-in";
+        }
+        if (pageNumber === 2) {
+          checkoutPage.classList.add("active");
+          document.getElementById("page-title").innerHTML =
+            '<i class="fas fa-clock"></i> Kunjungan Berlangsung';
+          document.getElementById("page-subtitle").textContent =
+            "Klik checkout jika sudah selesai";
+        }
+        if (pageNumber === 3) {
+          completionPage.classList.add("active");
+          document.getElementById("page-title").innerHTML =
+            '<i class="fas fa-check-circle"></i> Selesai';
+          document.getElementById("page-subtitle").textContent =
+            "Kunjungan telah selesai";
+        }
+        // Update progress bar
+        const steps = [
+          document.getElementById("step-1"),
+          document.getElementById("step-2"),
+          document.getElementById("step-3"),
+        ];
+        const stepLabels = document.querySelectorAll(".step-label");
+        const progressLine = document.getElementById("progress-line");
+        steps.forEach((step, index) => {
+          step.classList.remove("active", "completed");
+          stepLabels[index].classList.remove("active", "completed");
+          if (index < pageNumber - 1) {
+            step.classList.add("completed");
+            stepLabels[index].classList.add("completed");
+          }
+          if (index + 1 === pageNumber) {
+            step.classList.add("active");
+            stepLabels[index].classList.add("active");
+          }
+        });
+        progressLine.style.width = (pageNumber - 1) * 50 + "%";
+      }
+
+      photoInput.addEventListener("change", function (e) {
+        if (e.target.files && e.target.files[0]) {
+          const reader = new FileReader();
+          reader.onload = function (event) {
+            photoPreview.src = event.target.result;
+            photoPreview.style.display = "block";
+            document.getElementById("camera-placeholder").style.display =
+              "none";
+          };
+          reader.readAsDataURL(e.target.files[0]);
+        }
+      });
+
+      document
+        .getElementById("checkin-form")
+        .addEventListener("submit", function (e) {
+          e.preventDefault();
+          loader.style.display = "block";
+          if (signaturePad.isEmpty() || photoInput.files.length === 0) {
+            alert("Tanda tangan dan foto kartu nama tidak boleh kosong.");
+            loader.style.display = "none";
+            return;
+          }
+          const photoFile = photoInput.files[0];
+          const reader = new FileReader();
+          reader.readAsDataURL(photoFile);
+          reader.onloadend = function () {
+            const formObject = {
+              namaSales: document.getElementById("nama-sales").value,
+              supplier: document.getElementById("supplier").value,
+              photoUrl: reader.result,
+              signatureUrl: signaturePad.toDataURL(),
+            };
+            fetch(SCRIPT_URL, {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({ action: "checkin", data: formObject }),
+            })
+              .then((res) => res.json())
+              .then((result) => {
+                console.log("Check-in result:", result);
+                loader.style.display = "none";
+                if (result.success) {
+                  currentVisitId = result.visitId;
+                  checkinTimestampISO = result.checkinTime;
+                  document.getElementById("display-visit-id").textContent =
+                    currentVisitId;
+                  document.getElementById("display-checkin-time").textContent =
+                    new Date(checkinTimestampISO).toLocaleString();
+                  showPage(2);
+                } else {
+                  alert(
+                    "Gagal check-in: " + (result.message || "Unknown error")
+                  );
+                }
+              })
+              .catch((err) => {
+                loader.style.display = "none";
+                console.error("Fetch error:", err);
+                alert(
+                  "Gagal mengirim data ke server. Cek koneksi internet atau hubungi admin."
+                );
+              });
+          };
+        });
+
+      document
+        .getElementById("checkout-btn")
+        .addEventListener("click", function () {
+          loader.style.display = "block";
+          fetch(SCRIPT_URL, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              action: "checkout",
+              data: { visitId: currentVisitId },
+            }),
+          })
+            .then((res) => res.json())
+            .then((result) => {
+              console.log("Checkout result:", result);
+              loader.style.display = "none";
+              if (result.success) {
+                document.getElementById("final-visit-id").textContent =
+                  currentVisitId;
+                document.getElementById("final-checkin-time").textContent =
+                  new Date(checkinTimestampISO).toLocaleString();
+                document.getElementById("final-checkout-time").textContent =
+                  new Date(result.checkoutTime).toLocaleString();
+                document.getElementById("final-duration").textContent =
+                  result.duration.formatted;
+                showPage(3);
+              } else {
+                alert("Gagal checkout: " + (result.message || "Unknown error"));
+              }
+            })
+            .catch((err) => {
+              loader.style.display = "none";
+              console.error("Fetch error:", err);
+              alert(
+                "Gagal mengirim data ke server. Cek koneksi internet atau hubungi admin."
+              );
+            });
+        });
+
+      function onCheckInSuccess(result) {
+        loader.style.display = "none";
+        if (result.success) {
+          currentVisitId = result.visitId;
+          checkinTimestampISO = result.checkinTime;
+          document.getElementById("display-visit-id").textContent =
+            currentVisitId;
+          document.getElementById("display-checkin-time").textContent =
+            new Date(checkinTimestampISO).toLocaleString("id-ID");
+          showPage(2);
+        } else {
+          alert("Gagal Check-in: " + result.message);
+        }
+      }
+
+      function onCheckOutSuccess(result) {
+        loader.style.display = "none";
+        if (result.success) {
+          document.getElementById("final-visit-id").textContent =
+            currentVisitId;
+          document.getElementById("final-checkin-time").textContent = new Date(
+            checkinTimestampISO
+          ).toLocaleString("id-ID");
+          document.getElementById("final-checkout-time").textContent = new Date(
+            result.checkoutTime
+          ).toLocaleString("id-ID");
+          document.getElementById("final-duration").textContent =
+            result.duration.formatted;
+          showPage(3);
+        } else {
+          alert("Gagal Check-out: " + result.message);
+        }
+      }
+
+      window.addEventListener("load", () => {
+        document.getElementById("timestamp").value = new Date().toLocaleString(
+          "id-ID"
+        );
+        signaturePad.clear();
+      });
+
+      document
+        .getElementById("new-visit-btn")
+        .addEventListener("click", function () {
+          document.getElementById("checkin-form").reset();
+          document.getElementById("timestamp").value =
+            new Date().toLocaleString("id-ID");
+          photoPreview.style.display = "none";
+          document.getElementById("camera-placeholder").style.display = "block";
+          signaturePad.clear();
+          currentVisitId = null;
+          checkinTimestampISO = null;
+          showPage(1);
+        });
+    </script>
+  </body>
+</html>
