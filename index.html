@@ -1,648 +1,909 @@
 <!DOCTYPE html>
 <html lang="id">
   <head>
-    <base target="_top" />
     <meta charset="UTF-8" />
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no"
-    />
-    <title>Sistem Absensi Sales - AQSHAMART</title>
-    <link
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
-      rel="stylesheet"
-    />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Absensi Kunjungan Sales & MD</title>
     <style>
       * {
         margin: 0;
         padding: 0;
         box-sizing: border-box;
-        -webkit-tap-highlight-color: transparent;
       }
-      html {
-        font-size: 16px;
-      }
+
       body {
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-          Oxygen, Ubuntu, Cantarell, sans-serif;
-        background: linear-gradient(135deg, #16a34a 0%, #f97316 100%);
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(
+          135deg,
+          #ff8c00 0%,
+          #228b22 50%,
+          #ff6347 100%
+        );
         min-height: 100vh;
         display: flex;
-        align-items: flex-start;
+        align-items: center;
         justify-content: center;
-        padding: 8px;
+        padding: 20px;
+        position: relative;
+        overflow-x: hidden;
       }
-      .container {
-        background: rgba(255, 255, 255, 0.98);
-        border-radius: 20px;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+
+      /* Animated Starfield Background */
+      .stars {
+        position: fixed;
+        top: 0;
+        left: 0;
         width: 100%;
-        max-width: 400px;
-        overflow: hidden;
+        height: 100%;
+        pointer-events: none;
+        z-index: 0;
       }
-      .header {
-        background: linear-gradient(135deg, #16a34a, #15803d);
-        color: white;
-        padding: 20px 16px;
-        text-align: center;
-      }
-      .header h1 {
-        font-size: 18px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 8px;
-      }
-      .header p {
-        opacity: 0.9;
-        font-size: 12px;
-      }
-      .progress-container {
+
+      .star {
+        position: absolute;
         background: white;
-        padding: 12px 16px 16px;
-        border-bottom: 1px solid #e5e7eb;
-      }
-      .progress-bar {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        position: relative;
-        margin: 0 10px;
-      }
-      .progress-bar::before {
-        content: "";
-        position: absolute;
-        top: 50%;
-        left: 0;
-        right: 0;
-        height: 2px;
-        background: #e5e7eb;
-        z-index: 1;
-      }
-      .progress-line {
-        position: absolute;
-        top: 50%;
-        left: 0;
-        height: 2px;
-        background: linear-gradient(90deg, #16a34a, #f97316);
-        z-index: 2;
-        transition: width 0.5s ease;
-      }
-      .progress-step {
-        width: 32px;
-        height: 32px;
         border-radius: 50%;
-        background: #e5e7eb;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: #6b7280;
-        font-weight: 600;
-        font-size: 11px;
+        animation: twinkle 3s infinite;
+      }
+
+      .star:nth-child(odd) {
+        animation-delay: 1s;
+      }
+
+      .star:nth-child(3n) {
+        animation-delay: 2s;
+      }
+
+      @keyframes twinkle {
+        0%,
+        100% {
+          opacity: 0.3;
+          transform: scale(1);
+        }
+        50% {
+          opacity: 1;
+          transform: scale(1.2);
+        }
+      }
+
+      .star.moving {
+        animation: moveAcross 8s linear infinite;
+      }
+
+      @keyframes moveAcross {
+        0% {
+          transform: translateX(-100px) translateY(0);
+          opacity: 0;
+        }
+        10% {
+          opacity: 1;
+        }
+        90% {
+          opacity: 1;
+        }
+        100% {
+          transform: translateX(calc(100vw + 100px)) translateY(-50px);
+          opacity: 0;
+        }
+      }
+
+      .container {
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: 20px;
+        box-shadow: 0 25px 50px rgba(0, 0, 0, 0.2);
+        padding: 40px;
+        max-width: 500px;
+        width: 100%;
+        animation: slideIn 0.5s ease-out;
         position: relative;
-        z-index: 3;
-        transition: all 0.3s ease;
+        z-index: 1;
+        backdrop-filter: blur(10px);
+        border: 2px solid rgba(255, 140, 0, 0.3);
       }
-      .progress-step.active {
-        background: linear-gradient(135deg, #16a34a, #15803d);
-        color: white;
+
+      @keyframes slideIn {
+        from {
+          opacity: 0;
+          transform: translateY(-20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
       }
-      .progress-step.completed {
-        background: linear-gradient(135deg, #f97316, #ea580c);
-        color: white;
+
+      h1 {
+        background: linear-gradient(45deg, #ff8c00, #228b22);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        text-align: center;
+        margin-bottom: 30px;
+        font-size: 24px;
+        font-weight: 700;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
       }
-      .step-label {
-        position: absolute;
-        top: 38px;
-        left: 50%;
-        transform: translateX(-50%);
-        font-size: 9px;
-        color: #6b7280;
-        white-space: nowrap;
+
+      .form-group {
+        margin-bottom: 25px;
       }
-      .step-label.active {
-        color: #16a34a;
+
+      label {
+        display: block;
+        color: #2d5016;
         font-weight: 600;
-      }
-      .step-label.completed {
-        color: #f97316;
-        font-weight: 600;
-      }
-      .form-container {
-        padding: 20px 16px 24px;
-      }
-      .field-group {
-        margin-bottom: 18px;
-      }
-      .field-label {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        font-weight: 600;
-        color: #374151;
         margin-bottom: 8px;
         font-size: 14px;
       }
-      .form-input {
+
+      input[type="text"],
+      input[type="email"] {
         width: 100%;
-        padding: 14px 16px;
-        border: 2px solid #e5e7eb;
+        padding: 15px;
+        border: 2px solid #ffa500;
         border-radius: 12px;
         font-size: 16px;
+        transition: all 0.3s ease;
+        background: rgba(255, 255, 255, 0.9);
       }
-      .form-input:focus {
+
+      input[type="text"]:focus,
+      input[type="email"]:focus {
         outline: none;
-        border-color: #16a34a;
+        border-color: #228b22;
+        box-shadow: 0 0 15px rgba(34, 139, 34, 0.3);
+        transform: translateY(-2px);
       }
-      .form-input:read-only {
-        background: #f9fafb;
-        cursor: not-allowed;
-      }
-      .camera-section {
-        border: 2px dashed #e5e7eb;
-        border-radius: 16px;
-        padding: 16px;
-        text-align: center;
-      }
-      .camera-preview {
-        width: 100%;
-        max-width: 280px;
-        height: 160px;
+
+      .camera-container {
+        position: relative;
+        background: linear-gradient(
+          135deg,
+          rgba(255, 165, 0, 0.1),
+          rgba(34, 139, 34, 0.1)
+        );
+        border: 2px dashed #ff8c00;
         border-radius: 12px;
-        object-fit: cover;
-        margin: 0 auto 12px;
+        padding: 20px;
+        text-align: center;
+        transition: all 0.3s ease;
+      }
+
+      .camera-container:hover {
+        border-color: #228b22;
+        background: linear-gradient(
+          135deg,
+          rgba(34, 139, 34, 0.1),
+          rgba(255, 165, 0, 0.1)
+        );
+        transform: translateY(-2px);
+      }
+
+      #video {
+        width: 100%;
+        max-width: 300px;
+        border-radius: 12px;
+        display: none;
+        border: 3px solid #ff8c00;
+      }
+
+      #canvas {
         display: none;
       }
-      #camera-placeholder i {
-        font-size: 36px !important;
-        color: #d1d5db;
-        margin-bottom: 12px;
-        display: block;
-      }
-      .btn {
-        padding: 12px 16px;
-        border: none;
-        border-radius: 10px;
-        font-weight: 600;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        gap: 6px;
-      }
-      .btn-primary {
-        background: linear-gradient(135deg, #16a34a, #15803d);
-        color: white;
-      }
-      .signature-container {
-        border: 2px solid #e5e7eb;
-        border-radius: 16px;
-        padding: 12px;
-      }
-      .signature-pad {
+
+      .photo-preview {
         width: 100%;
-        height: 100px;
-        border: 2px dashed #d1d5db;
+        max-width: 300px;
         border-radius: 12px;
-        cursor: crosshair;
+        margin-top: 10px;
+        border: 3px solid #228b22;
       }
-      .submit-btn {
-        width: 100%;
-        padding: 16px;
-        background: linear-gradient(135deg, #f97316, #ea580c);
+
+      .camera-btn {
+        background: linear-gradient(45deg, #ff8c00, #ffa500);
         color: white;
         border: none;
-        border-radius: 16px;
+        padding: 12px 24px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        margin: 5px;
+        box-shadow: 0 4px 15px rgba(255, 140, 0, 0.3);
+      }
+
+      .camera-btn:hover {
+        background: linear-gradient(45deg, #228b22, #32cd32);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(34, 139, 34, 0.4);
+      }
+
+      .camera-btn:disabled {
+        background: #ccc;
+        cursor: not-allowed;
+        transform: none;
+        box-shadow: none;
+      }
+
+      .signature-container {
+        border: 2px solid #ff8c00;
+        border-radius: 12px;
+        background: rgba(255, 255, 255, 0.9);
+        position: relative;
+        transition: all 0.3s ease;
+      }
+
+      .signature-container:hover {
+        border-color: #228b22;
+        box-shadow: 0 0 15px rgba(34, 139, 34, 0.2);
+      }
+
+      #signature-pad {
+        width: 100%;
+        height: 150px;
+        border-radius: 10px;
+      }
+
+      .signature-controls {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 10px;
+      }
+
+      .btn {
+        background: linear-gradient(45deg, #228b22, #32cd32);
+        color: white;
+        border: none;
+        padding: 15px 30px;
+        border-radius: 12px;
+        cursor: pointer;
         font-size: 16px;
         font-weight: 700;
-        cursor: pointer;
+        transition: all 0.3s ease;
+        width: 100%;
+        box-shadow: 0 6px 20px rgba(34, 139, 34, 0.3);
+        text-transform: uppercase;
+        letter-spacing: 1px;
       }
-      .loader {
-        display: none;
+
+      .btn:hover {
+        background: linear-gradient(45deg, #ff8c00, #ffa500);
+        transform: translateY(-3px);
+        box-shadow: 0 8px 25px rgba(255, 140, 0, 0.4);
+      }
+
+      .btn:disabled {
+        background: #ccc;
+        cursor: not-allowed;
+        transform: none;
+        box-shadow: none;
+      }
+
+      .btn-secondary {
+        background: linear-gradient(45deg, #ff6347, #ff8c00);
+        padding: 8px 16px;
+        font-size: 14px;
+        width: auto;
+        box-shadow: 0 4px 15px rgba(255, 99, 71, 0.3);
+      }
+
+      .btn-secondary:hover {
+        background: linear-gradient(45deg, #228b22, #32cd32);
+        box-shadow: 0 6px 20px rgba(34, 139, 34, 0.4);
+      }
+
+      .timestamp {
+        background: linear-gradient(
+          135deg,
+          rgba(255, 140, 0, 0.2),
+          rgba(34, 139, 34, 0.2)
+        );
+        padding: 15px;
+        border-radius: 12px;
         text-align: center;
-        padding: 30px 20px;
+        margin-bottom: 20px;
+        font-weight: 600;
+        color: #2d5016;
+        border: 2px solid rgba(255, 140, 0, 0.3);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
       }
-      .loader-spinner {
-        width: 40px;
-        height: 40px;
-        border: 3px solid #f3f4f6;
-        border-top: 3px solid #16a34a;
-        border-radius: 50%;
-        animation: spin 1s linear infinite;
-        margin: 0 auto 16px;
+
+      .hidden {
+        display: none;
       }
-      @keyframes spin {
+
+      .success-message {
+        background: linear-gradient(
+          135deg,
+          rgba(34, 139, 34, 0.2),
+          rgba(50, 205, 50, 0.2)
+        );
+        color: #155724;
+        padding: 20px;
+        border-radius: 12px;
+        margin-bottom: 20px;
+        text-align: center;
+        border: 2px solid rgba(34, 139, 34, 0.3);
+        font-weight: 600;
+        box-shadow: 0 4px 15px rgba(34, 139, 34, 0.2);
+      }
+
+      .summary-item {
+        display: flex;
+        justify-content: space-between;
+        padding: 15px 0;
+        border-bottom: 2px solid rgba(255, 140, 0, 0.2);
+        transition: all 0.3s ease;
+      }
+
+      .summary-item:hover {
+        background: rgba(255, 140, 0, 0.05);
+        padding-left: 10px;
+        border-radius: 8px;
+      }
+
+      .summary-item:last-child {
+        border-bottom: none;
+      }
+
+      .summary-label {
+        font-weight: 600;
+        color: #2d5016;
+      }
+
+      .summary-value {
+        color: #ff8c00;
+        font-weight: 700;
+      }
+
+      .duration-highlight {
+        background: linear-gradient(
+          135deg,
+          rgba(255, 140, 0, 0.2),
+          rgba(34, 139, 34, 0.2)
+        );
+        padding: 20px;
+        border-radius: 12px;
+        text-align: center;
+        margin: 20px 0;
+        border: 2px solid rgba(255, 140, 0, 0.3);
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+      }
+
+      .duration-highlight h3 {
+        color: #2d5016;
+        margin-bottom: 10px;
+        font-size: 18px;
+      }
+
+      .duration-highlight span {
+        font-size: 28px;
+        font-weight: bold;
+        background: linear-gradient(45deg, #ff8c00, #228b22);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+
+      @media (max-width: 480px) {
+        .container {
+          padding: 20px;
+          margin: 10px;
+        }
+
+        h1 {
+          font-size: 20px;
+        }
+      }
+
+      /* Pulse animation for important elements */
+      .pulse {
+        animation: pulse 2s infinite;
+      }
+
+      @keyframes pulse {
         0% {
-          transform: rotate(0deg);
+          box-shadow: 0 0 0 0 rgba(255, 140, 0, 0.7);
+        }
+        70% {
+          box-shadow: 0 0 0 10px rgba(255, 140, 0, 0);
         }
         100% {
-          transform: rotate(360deg);
+          box-shadow: 0 0 0 0 rgba(255, 140, 0, 0);
         }
-      }
-      .page {
-        display: none;
-      }
-      .page.active {
-        display: block;
-      }
-      .checkout-container,
-      .completion-container {
-        text-align: center;
-        padding: 30px 20px 40px;
-      }
-      .visit-info {
-        background: #f8fafc;
-        border-radius: 16px;
-        padding: 16px;
-        margin-bottom: 24px;
-        text-align: left;
       }
     </style>
   </head>
   <body>
-    <div class="container">
-      <div class="header">
-        <div class="header-content">
-          <h1 id="page-title">
-            <i class="fas fa-user-check"></i> Absensi Kunjungan Sales & MD
-          </h1>
-          <p id="page-subtitle"></p>
-        </div>
-      </div>
-      <div class="progress-container">
-        <div class="progress-bar">
-          <div class="progress-line" id="progress-line"></div>
-          <div class="progress-step active" id="step-1">
-            <i class="fas fa-user-edit"></i>
-            <div class="step-label active">Check-in</div>
-          </div>
-          <div class="progress-step" id="step-2">
-            <i class="fas fa-clock"></i>
-            <div class="step-label">Kunjungan</div>
-          </div>
-          <div class="progress-step" id="step-3">
-            <i class="fas fa-check-circle"></i>
-            <div class="step-label">Selesai</div>
-          </div>
-        </div>
-      </div>
+    <!-- Animated Stars Background -->
+    <div class="stars" id="stars"></div>
 
-      <div id="checkin-page" class="page active">
-        <div class="form-container">
-          <form id="checkin-form">
-            <div class="field-group">
-              <label class="field-label"
-                ><i class="fas fa-clock"></i>Timestamp</label
-              >
-              <input type="text" id="timestamp" class="form-input" readonly />
+    <!-- Halaman Check-in -->
+    <div class="container" id="checkin-page">
+      <h1>🌟 Absensi Kunjungan Sales & MD 🌟</h1>
+
+      <div class="timestamp" id="checkin-timestamp"></div>
+
+      <form id="checkin-form">
+        <div class="form-group">
+          <label for="nama">👤 Nama:</label>
+          <input type="text" id="nama" name="nama" required />
+        </div>
+
+        <div class="form-group">
+          <label for="supplier">🏢 Supplier:</label>
+          <input type="text" id="supplier" name="supplier" required />
+        </div>
+
+        <div class="form-group">
+          <label for="photo">📷 Foto Kartu Nama:</label>
+          <div class="camera-container">
+            <div id="camera-placeholder">
+              <p>📸 Klik tombol di bawah untuk mengambil foto kartu nama</p>
             </div>
-            <div class="field-group">
-              <label class="field-label"
-                ><i class="fas fa-user"></i>Nama Sales</label
-              >
-              <input type="text" id="nama-sales" class="form-input" required />
-            </div>
-            <div class="field-group">
-              <label class="field-label"
-                ><i class="fas fa-building"></i>Supplier</label
-              >
-              <input type="text" id="supplier" class="form-input" required />
-            </div>
-            <div class="field-group">
-              <label class="field-label"
-                ><i class="fas fa-camera"></i>Foto Kartu Nama</label
-              >
-              <div class="camera-section">
-                <input
-                  type="file"
-                  id="photo-input"
-                  accept="image/*"
-                  capture="environment"
-                  style="display: none"
-                />
-                <img
-                  id="photo-preview"
-                  class="camera-preview"
-                  alt="Preview foto"
-                />
-                <div id="camera-placeholder">
-                  <i class="fas fa-camera"></i>
-                  <button
-                    type="button"
-                    onclick="document.getElementById('photo-input').click()"
-                    class="btn btn-primary"
-                  >
-                    Ambil Foto
-                  </button>
-                </div>
-              </div>
-            </div>
-            <div class="field-group">
-              <label class="field-label"
-                ><i class="fas fa-signature"></i>Tanda Tangan Digital</label
-              >
-              <div class="signature-container">
-                <canvas id="signature-pad" class="signature-pad"></canvas>
-              </div>
+            <video id="video" autoplay></video>
+            <canvas id="canvas"></canvas>
+            <div id="photo-preview"></div>
+            <div style="margin-top: 15px">
+              <button type="button" class="camera-btn" id="start-camera">
+                🎥 Buka Kamera
+              </button>
               <button
                 type="button"
-                onclick="signaturePad.clear()"
-                class="btn btn-outline"
-                style="
-                  width: auto;
-                  padding: 5px 10px;
-                  font-size: 12px;
-                  margin-top: 5px;
-                "
+                class="camera-btn"
+                id="take-photo"
+                style="display: none"
               >
-                Hapus TTD
+                📸 Ambil Foto
+              </button>
+              <button
+                type="button"
+                class="camera-btn"
+                id="retake-photo"
+                style="display: none"
+              >
+                🔄 Foto Ulang
               </button>
             </div>
-            <button type="submit" id="submit-btn" class="submit-btn">
-              <i class="fas fa-check-circle"></i>Check-in Sekarang
-            </button>
-          </form>
-          <div id="loader" class="loader">
-            <div class="loader-spinner"></div>
-            <h3>Memproses Data...</h3>
           </div>
         </div>
-      </div>
 
-      <div id="checkout-page" class="page">
-        <div class="checkout-container">
-          <h2>Kunjungan Berlangsung</h2>
-          <p>
-            Anda telah berhasil check-in. Silahkan klik tombol Checkout jika
-            sudah selesai.
-          </p>
-          <div class="visit-info">
-            <p>
-              <strong>ID Kunjungan:</strong> <span id="display-visit-id"></span>
-            </p>
-            <p>
-              <strong>Check-in:</strong> <span id="display-checkin-time"></span>
-            </p>
+        <div class="form-group">
+          <label for="signature">✍️ Tanda Tangan:</label>
+          <div class="signature-container">
+            <canvas id="signature-pad"></canvas>
+            <div class="signature-controls">
+              <button type="button" class="btn-secondary" id="clear-signature">
+                🗑️ Hapus Tanda Tangan
+              </button>
+            </div>
           </div>
-          <button type="button" id="checkout-btn" class="submit-btn">
-            Checkout Sekarang
-          </button>
         </div>
-      </div>
 
-      <div id="completion-page" class="page">
-        <div class="completion-container">
-          <h2>Kunjungan Selesai!</h2>
-          <p>Terima kasih. Data kunjungan Anda telah berhasil dicatat.</p>
-          <div class="visit-info">
-            <p>
-              <strong>ID Kunjungan:</strong> <span id="final-visit-id"></span>
-            </p>
-            <p>
-              <strong>Check-in:</strong> <span id="final-checkin-time"></span>
-            </p>
-            <p>
-              <strong>Checkout:</strong> <span id="final-checkout-time"></span>
-            </p>
-            <p><strong>Durasi:</strong> <span id="final-duration"></span></p>
-          </div>
-          <button type="button" id="new-visit-btn" class="btn btn-primary">
-            Absen Kunjungan Baru
-          </button>
-        </div>
-      </div>
+        <button type="submit" class="btn pulse">
+          ✅ Submit Check-in Sekarang
+        </button>
+      </form>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.0.0/dist/signature_pad.umd.min.js"></script>
+    <!-- Halaman Check-out -->
+    <div class="container hidden" id="checkout-page">
+      <h1>🚪 Check-out Kunjungan</h1>
+
+      <div class="success-message">
+        ✅ Check-in berhasil! Selamat melakukan kunjungan ke AQSHAMART.
+      </div>
+
+      <div class="timestamp" id="checkout-timestamp"></div>
+
+      <p
+        style="
+          text-align: center;
+          margin: 30px 0;
+          font-size: 16px;
+          color: #2d5016;
+          font-weight: 500;
+        "
+      >
+        Jika sudah selesai kunjungan ke
+        <strong style="color: #ff8c00">AQSHAMART</strong>, silakan klik tombol
+        di bawah untuk check-out.
+      </p>
+
+      <button type="button" class="btn pulse" id="checkout-btn">
+        🏁 Check-out Sekarang
+      </button>
+    </div>
+
+    <!-- Halaman Summary -->
+    <div class="container hidden" id="summary-page">
+      <h1>🎉 Kunjungan Selesai</h1>
+
+      <div class="success-message">
+        🎊 Kunjungan telah selesai! Terima kasih atas kunjungan Anda ke
+        AQSHAMART.
+      </div>
+
+      <div class="summary-item">
+        <span class="summary-label">👤 Nama:</span>
+        <span class="summary-value" id="summary-nama"></span>
+      </div>
+
+      <div class="summary-item">
+        <span class="summary-label">🏢 Supplier:</span>
+        <span class="summary-value" id="summary-supplier"></span>
+      </div>
+
+      <div class="summary-item">
+        <span class="summary-label">🕐 Waktu Check-in:</span>
+        <span class="summary-value" id="summary-checkin"></span>
+      </div>
+
+      <div class="summary-item">
+        <span class="summary-label">🕑 Waktu Check-out:</span>
+        <span class="summary-value" id="summary-checkout"></span>
+      </div>
+
+      <div class="duration-highlight">
+        <h3>⏱️ Durasi Kunjungan</h3>
+        <span id="summary-duration"></span>
+      </div>
+
+      <button type="button" class="btn" onclick="location.reload()">
+        🔄 Kunjungan Baru
+      </button>
+    </div>
+
     <script>
-      // PASTE URL WEB APP ANDA DARI HASIL DEPLOY APPS SCRIPT
-      const SCRIPT_URL =
-        "https://script.google.com/macros/s/AKfycbzFsD9VQfdosG700tZtCGJ-vJKeGuwrfyi-9-O33a1rdCxCGoqLrNlMiaHpKnFYPHymeQ/exec";
+      // Create animated stars
+      function createStars() {
+        const starsContainer = document.getElementById("stars");
+        const numberOfStars = 50;
 
-      const checkinPage = document.getElementById("checkin-page");
-      const checkoutPage = document.getElementById("checkout-page");
-      const completionPage = document.getElementById("completion-page");
-      const loader = document.getElementById("loader");
-      const photoInput = document.getElementById("photo-input");
-      const photoPreview = document.getElementById("photo-preview");
-      const signaturePadCanvas = document.getElementById("signature-pad");
-      const signaturePad = new SignaturePad(signaturePadCanvas, {
-        minWidth: 1,
-        maxWidth: 2,
-      });
-      let currentVisitId = null;
-      let checkinTimestampISO = null;
+        for (let i = 0; i < numberOfStars; i++) {
+          const star = document.createElement("div");
+          star.className = "star";
 
-      function showPage(pageNumber) {
-        document
-          .querySelectorAll(".page")
-          .forEach((p) => p.classList.remove("active"));
-        if (pageNumber === 1) {
-          checkinPage.classList.add("active");
-          document.getElementById("page-title").innerHTML =
-            '<i class="fas fa-user-check"></i> Absensi Kunjungan Sales & MD';
-          document.getElementById("page-subtitle").textContent =
-            "Silakan isi form check-in";
-        }
-        if (pageNumber === 2) {
-          checkoutPage.classList.add("active");
-          document.getElementById("page-title").innerHTML =
-            '<i class="fas fa-clock"></i> Kunjungan Berlangsung';
-          document.getElementById("page-subtitle").textContent =
-            "Klik checkout jika sudah selesai";
-        }
-        if (pageNumber === 3) {
-          completionPage.classList.add("active");
-          document.getElementById("page-title").innerHTML =
-            '<i class="fas fa-check-circle"></i> Selesai';
-          document.getElementById("page-subtitle").textContent =
-            "Kunjungan telah selesai";
-        }
-        // Update progress bar
-        const steps = [
-          document.getElementById("step-1"),
-          document.getElementById("step-2"),
-          document.getElementById("step-3"),
-        ];
-        const stepLabels = document.querySelectorAll(".step-label");
-        const progressLine = document.getElementById("progress-line");
-        steps.forEach((step, index) => {
-          step.classList.remove("active", "completed");
-          stepLabels[index].classList.remove("active", "completed");
-          if (index < pageNumber - 1) {
-            step.classList.add("completed");
-            stepLabels[index].classList.add("completed");
+          // Random size
+          const size = Math.random() * 3 + 1;
+          star.style.width = size + "px";
+          star.style.height = size + "px";
+
+          // Random position
+          star.style.left = Math.random() * 100 + "%";
+          star.style.top = Math.random() * 100 + "%";
+
+          // Some stars move across screen
+          if (Math.random() > 0.7) {
+            star.classList.add("moving");
+            star.style.animationDelay = Math.random() * 8 + "s";
           }
-          if (index + 1 === pageNumber) {
-            step.classList.add("active");
-            stepLabels[index].classList.add("active");
-          }
-        });
-        progressLine.style.width = (pageNumber - 1) * 50 + "%";
+
+          starsContainer.appendChild(star);
+        }
       }
 
-      photoInput.addEventListener("change", function (e) {
-        if (e.target.files && e.target.files[0]) {
-          const reader = new FileReader();
-          reader.onload = function (event) {
-            photoPreview.src = event.target.result;
-            photoPreview.style.display = "block";
-            document.getElementById("camera-placeholder").style.display =
-              "none";
-          };
-          reader.readAsDataURL(e.target.files[0]);
-        }
+      // Initialize stars when page loads
+      document.addEventListener("DOMContentLoaded", function () {
+        createStars();
       });
 
+      // Global variables
+      let stream;
+      let photoData = null;
+      let signatureData = null;
+      let checkinTime = null;
+      let checkoutTime = null;
+      let absensiData = {};
+
+      // Initialize
+      document.addEventListener("DOMContentLoaded", function () {
+        updateTimestamp();
+        initializeSignaturePad();
+        initializeCamera();
+
+        // Update timestamp every second
+        setInterval(updateTimestamp, 1000);
+      });
+
+      // Update timestamp
+      function updateTimestamp() {
+        const now = new Date();
+        const options = {
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+          hour: "2-digit",
+          minute: "2-digit",
+          second: "2-digit",
+          timeZone: "Asia/Jakarta",
+        };
+
+        const timestamp = now.toLocaleString("id-ID", options);
+        const checkinEl = document.getElementById("checkin-timestamp");
+        const checkoutEl = document.getElementById("checkout-timestamp");
+
+        if (checkinEl) {
+          checkinEl.textContent = `📅 ${timestamp} WIB`;
+        }
+        if (checkoutEl) {
+          checkoutEl.textContent = `📅 ${timestamp} WIB`;
+        }
+      }
+
+      // Initialize signature pad
+      function initializeSignaturePad() {
+        const canvas = document.getElementById("signature-pad");
+        const ctx = canvas.getContext("2d");
+
+        // Set canvas size
+        canvas.width = canvas.offsetWidth;
+        canvas.height = 150;
+
+        let isDrawing = false;
+        let hasSignature = false;
+
+        // Mouse events
+        canvas.addEventListener("mousedown", startDrawing);
+        canvas.addEventListener("mousemove", draw);
+        canvas.addEventListener("mouseup", stopDrawing);
+        canvas.addEventListener("mouseout", stopDrawing);
+
+        // Touch events
+        canvas.addEventListener("touchstart", handleTouch);
+        canvas.addEventListener("touchmove", handleTouch);
+        canvas.addEventListener("touchend", stopDrawing);
+
+        function startDrawing(e) {
+          isDrawing = true;
+          hasSignature = true;
+          ctx.beginPath();
+          ctx.moveTo(getPos(e).x, getPos(e).y);
+        }
+
+        function draw(e) {
+          if (!isDrawing) return;
+
+          ctx.lineWidth = 2;
+          ctx.lineCap = "round";
+          ctx.strokeStyle = "#333";
+
+          ctx.lineTo(getPos(e).x, getPos(e).y);
+          ctx.stroke();
+          ctx.beginPath();
+          ctx.moveTo(getPos(e).x, getPos(e).y);
+        }
+
+        function stopDrawing() {
+          if (isDrawing) {
+            isDrawing = false;
+            signatureData = canvas.toDataURL();
+          }
+        }
+
+        function handleTouch(e) {
+          e.preventDefault();
+          const touch = e.touches[0];
+          const mouseEvent = new MouseEvent(
+            e.type === "touchstart"
+              ? "mousedown"
+              : e.type === "touchmove"
+              ? "mousemove"
+              : "mouseup",
+            {
+              clientX: touch.clientX,
+              clientY: touch.clientY,
+            }
+          );
+          canvas.dispatchEvent(mouseEvent);
+        }
+
+        function getPos(e) {
+          const rect = canvas.getBoundingClientRect();
+          return {
+            x: e.clientX - rect.left,
+            y: e.clientY - rect.top,
+          };
+        }
+
+        // Clear signature
+        document
+          .getElementById("clear-signature")
+          .addEventListener("click", function () {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            signatureData = null;
+            hasSignature = false;
+          });
+      }
+
+      // Initialize camera
+      function initializeCamera() {
+        const video = document.getElementById("video");
+        const canvas = document.getElementById("canvas");
+        const startBtn = document.getElementById("start-camera");
+        const takeBtn = document.getElementById("take-photo");
+        const retakeBtn = document.getElementById("retake-photo");
+        const placeholder = document.getElementById("camera-placeholder");
+        const preview = document.getElementById("photo-preview");
+
+        startBtn.addEventListener("click", startCamera);
+        takeBtn.addEventListener("click", takePhoto);
+        retakeBtn.addEventListener("click", retakePhoto);
+
+        async function startCamera() {
+          try {
+            stream = await navigator.mediaDevices.getUserMedia({
+              video: { facingMode: "environment" },
+            });
+            video.srcObject = stream;
+
+            placeholder.style.display = "none";
+            video.style.display = "block";
+            startBtn.style.display = "none";
+            takeBtn.style.display = "inline-block";
+          } catch (err) {
+            alert(
+              "Tidak dapat mengakses kamera. Pastikan browser mendukung dan izin kamera telah diberikan."
+            );
+            console.error("Error accessing camera:", err);
+          }
+        }
+
+        function takePhoto() {
+          const context = canvas.getContext("2d");
+          canvas.width = video.videoWidth;
+          canvas.height = video.videoHeight;
+
+          context.drawImage(video, 0, 0);
+          photoData = canvas.toDataURL("image/jpeg");
+
+          // Show preview
+          preview.innerHTML = `<img src="${photoData}" alt="Foto Kartu Nama" class="photo-preview">`;
+
+          // Stop camera
+          if (stream) {
+            stream.getTracks().forEach((track) => track.stop());
+          }
+
+          video.style.display = "none";
+          takeBtn.style.display = "none";
+          retakeBtn.style.display = "inline-block";
+        }
+
+        function retakePhoto() {
+          preview.innerHTML = "";
+          photoData = null;
+          retakeBtn.style.display = "none";
+          startBtn.style.display = "inline-block";
+        }
+      }
+
+      // Handle check-in form
       document
         .getElementById("checkin-form")
         .addEventListener("submit", function (e) {
           e.preventDefault();
-          loader.style.display = "block";
-          if (signaturePad.isEmpty() || photoInput.files.length === 0) {
-            alert("Tanda tangan dan foto kartu nama tidak boleh kosong.");
-            loader.style.display = "none";
+
+          const nama = document.getElementById("nama").value;
+          const supplier = document.getElementById("supplier").value;
+
+          // Validate required fields
+          if (!nama || !supplier) {
+            alert("Mohon lengkapi semua field yang wajib diisi!");
             return;
           }
-          const photoFile = photoInput.files[0];
-          const reader = new FileReader();
-          reader.readAsDataURL(photoFile);
-          reader.onloadend = function () {
-            const formObject = {
-              namaSales: document.getElementById("nama-sales").value,
-              supplier: document.getElementById("supplier").value,
-              photoUrl: reader.result,
-              signatureUrl: signaturePad.toDataURL(),
-            };
-            fetch(SCRIPT_URL, {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify({ action: "checkin", data: formObject }),
-            })
-              .then((res) => res.json())
-              .then((result) => {
-                console.log("Check-in result:", result);
-                loader.style.display = "none";
-                if (result.success) {
-                  currentVisitId = result.visitId;
-                  checkinTimestampISO = result.checkinTime;
-                  document.getElementById("display-visit-id").textContent =
-                    currentVisitId;
-                  document.getElementById("display-checkin-time").textContent =
-                    new Date(checkinTimestampISO).toLocaleString();
-                  showPage(2);
-                } else {
-                  alert(
-                    "Gagal check-in: " + (result.message || "Unknown error")
-                  );
-                }
-              })
-              .catch((err) => {
-                loader.style.display = "none";
-                console.error("Fetch error:", err);
-                alert(
-                  "Gagal mengirim data ke server. Cek koneksi internet atau hubungi admin."
-                );
-              });
+
+          if (!photoData) {
+            alert("Mohon ambil foto kartu nama terlebih dahulu!");
+            return;
+          }
+
+          if (!signatureData) {
+            alert("Mohon buat tanda tangan terlebih dahulu!");
+            return;
+          }
+
+          // Save check-in data
+          checkinTime = new Date();
+          absensiData = {
+            nama: nama,
+            supplier: supplier,
+            photoData: photoData,
+            signatureData: signatureData,
+            checkinTime: checkinTime,
           };
+
+          // Send to Google Sheets (you'll need to implement this)
+          sendToGoogleSheets("checkin", absensiData);
+
+          // Show checkout page
+          document.getElementById("checkin-page").classList.add("hidden");
+          document.getElementById("checkout-page").classList.remove("hidden");
         });
 
+      // Handle check-out
       document
         .getElementById("checkout-btn")
         .addEventListener("click", function () {
-          loader.style.display = "block";
-          fetch(SCRIPT_URL, {
+          checkoutTime = new Date();
+          absensiData.checkoutTime = checkoutTime;
+
+          // Calculate duration
+          const duration = Math.round((checkoutTime - checkinTime) / 1000 / 60); // in minutes
+          absensiData.duration = duration;
+
+          // Send checkout data to Google Sheets
+          sendToGoogleSheets("checkout", absensiData);
+
+          // Show summary
+          showSummary();
+
+          // Show summary page
+          document.getElementById("checkout-page").classList.add("hidden");
+          document.getElementById("summary-page").classList.remove("hidden");
+        });
+
+      // Show summary
+      function showSummary() {
+        document.getElementById("summary-nama").textContent = absensiData.nama;
+        document.getElementById("summary-supplier").textContent =
+          absensiData.supplier;
+        document.getElementById("summary-checkin").textContent = formatDateTime(
+          absensiData.checkinTime
+        );
+        document.getElementById("summary-checkout").textContent =
+          formatDateTime(absensiData.checkoutTime);
+        document.getElementById(
+          "summary-duration"
+        ).textContent = `${absensiData.duration} menit`;
+      }
+
+      // Format datetime
+      function formatDateTime(date) {
+        const options = {
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+          hour: "2-digit",
+          minute: "2-digit",
+          second: "2-digit",
+          timeZone: "Asia/Jakarta",
+        };
+        return date.toLocaleString("id-ID", options) + " WIB";
+      }
+
+      // Ganti bagian ini di HTML
+      function sendToGoogleSheets(action, data) {
+        // Add loading indicator
+        console.log("Sending data to Google Sheets...", action, data);
+
+        fetch(
+          "https://script.google.com/macros/s/AKfycbwl_jlBv4ZXGN8AO8MEjuH5JGlWlYRh0JD6qNmSaZuH9bQ9nGPPlMe-46ZoCGXWfQ6JoQ/exec",
+          {
             method: "POST",
+            mode: "no-cors", // Add this line
             headers: {
               "Content-Type": "application/json",
             },
             body: JSON.stringify({
-              action: "checkout",
-              data: { visitId: currentVisitId },
+              action: action,
+              data: data,
             }),
+          }
+        )
+          .then((response) => {
+            console.log("Response received:", response);
+            return response.text(); // Change to text() instead of json()
           })
-            .then((res) => res.json())
-            .then((result) => {
-              console.log("Checkout result:", result);
-              loader.style.display = "none";
-              if (result.success) {
-                document.getElementById("final-visit-id").textContent =
-                  currentVisitId;
-                document.getElementById("final-checkin-time").textContent =
-                  new Date(checkinTimestampISO).toLocaleString();
-                document.getElementById("final-checkout-time").textContent =
-                  new Date(result.checkoutTime).toLocaleString();
-                document.getElementById("final-duration").textContent =
-                  result.duration.formatted;
-                showPage(3);
-              } else {
-                alert("Gagal checkout: " + (result.message || "Unknown error"));
-              }
-            })
-            .catch((err) => {
-              loader.style.display = "none";
-              console.error("Fetch error:", err);
-              alert(
-                "Gagal mengirim data ke server. Cek koneksi internet atau hubungi admin."
-              );
-            });
-        });
-
-      function onCheckInSuccess(result) {
-        loader.style.display = "none";
-        if (result.success) {
-          currentVisitId = result.visitId;
-          checkinTimestampISO = result.checkinTime;
-          document.getElementById("display-visit-id").textContent =
-            currentVisitId;
-          document.getElementById("display-checkin-time").textContent =
-            new Date(checkinTimestampISO).toLocaleString("id-ID");
-          showPage(2);
-        } else {
-          alert("Gagal Check-in: " + result.message);
-        }
+          .then((result) => {
+            console.log("Success:", result);
+          })
+          .catch((error) => {
+            console.error("Error:", error);
+            // Don't show alert, just log for now since no-cors might hide actual response
+          });
       }
-
-      function onCheckOutSuccess(result) {
-        loader.style.display = "none";
-        if (result.success) {
-          document.getElementById("final-visit-id").textContent =
-            currentVisitId;
-          document.getElementById("final-checkin-time").textContent = new Date(
-            checkinTimestampISO
-          ).toLocaleString("id-ID");
-          document.getElementById("final-checkout-time").textContent = new Date(
-            result.checkoutTime
-          ).toLocaleString("id-ID");
-          document.getElementById("final-duration").textContent =
-            result.duration.formatted;
-          showPage(3);
-        } else {
-          alert("Gagal Check-out: " + result.message);
-        }
-      }
-
-      window.addEventListener("load", () => {
-        document.getElementById("timestamp").value = new Date().toLocaleString(
-          "id-ID"
-        );
-        signaturePad.clear();
-      });
-
-      document
-        .getElementById("new-visit-btn")
-        .addEventListener("click", function () {
-          document.getElementById("checkin-form").reset();
-          document.getElementById("timestamp").value =
-            new Date().toLocaleString("id-ID");
-          photoPreview.style.display = "none";
-          document.getElementById("camera-placeholder").style.display = "block";
-          signaturePad.clear();
-          currentVisitId = null;
-          checkinTimestampISO = null;
-          showPage(1);
-        });
     </script>
   </body>
 </html>
